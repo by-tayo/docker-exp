@@ -1,0 +1,9 @@
+services:
+  exporter:
+    build: .
+    container_name: docker-exp-exporter
+    ports:
+      - "8010:8010"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    restart: unless-stopped

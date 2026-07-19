@@ -1,0 +1,114 @@
+{
+  "id": null,
+  "uid": "dockerexp",
+  "title": "docker-exp Overview",
+  "tags": ["docker-exp", "docker"],
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "15s",
+  "time": { "from": "now-6h", "to": "now" },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Docker Snapshot",
+      "type": "table",
+      "gridPos": { "x": 0, "y": 0, "w": 24, "h": 6 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        { "expr": "docker_containers{state=\"running\"}", "legendFormat": "Running", "refId": "A", "instant": true, "format": "table" },
+        { "expr": "docker_containers{state=\"stopped\"}", "legendFormat": "Stopped", "refId": "B", "instant": true, "format": "table" },
+        { "expr": "docker_images_total", "legendFormat": "Images", "refId": "C", "instant": true, "format": "table" },
+        { "expr": "docker_images_reclaimable_bytes", "legendFormat": "Reclaimable Images", "refId": "D", "instant": true, "format": "table" },
+        { "expr": "docker_volumes_total", "legendFormat": "Volumes", "refId": "E", "instant": true, "format": "table" },
+        { "expr": "docker_build_cache_reclaimable_bytes", "legendFormat": "Reclaimable Build Cache", "refId": "F", "instant": true, "format": "table" },
+        { "expr": "docker_exporter_up", "legendFormat": "Docker API Up", "refId": "G", "instant": true, "format": "table" }
+      ],
+      "transformations": [
+        { "id": "merge", "options": {} },
+        { "id": "organize", "options": { "excludeByName": { "Time": true, "__name__": true, "job": true, "instance": true, "state": true }, "indexByName": {}, "renameByName": {} } }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": { "align": "center", "cellOptions": { "type": "color-background" } },
+          "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": null } ] }
+        },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "Docker API Up" }, "properties": [ { "id": "mappings", "value": [ { "type": "value", "options": { "0": { "text": "DOWN", "color": "red" }, "1": { "text": "UP", "color": "green" } } } ] }, { "id": "thresholds", "value": { "mode": "absolute", "steps": [ { "color": "red", "value": null }, { "color": "green", "value": 1 } ] } } ] },
+          { "matcher": { "id": "byRegexp", "options": "^Reclaimable" }, "properties": [ { "id": "unit", "value": "bytes" }, { "id": "thresholds", "value": { "mode": "absolute", "steps": [ { "color": "green", "value": null }, { "color": "yellow", "value": 2000000000 }, { "color": "red", "value": 5000000000 } ] } } ] }
+        ]
+      }
+    },
+    {
+      "id": 2,
+      "title": "Disk Usage: Images / Volumes / Build Cache",
+      "type": "timeseries",
+      "gridPos": { "x": 0, "y": 6, "w": 12, "h": 9 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        { "expr": "docker_images_size_bytes", "legendFormat": "Images (total)", "refId": "A" },
+        { "expr": "docker_images_reclaimable_bytes", "legendFormat": "Images (reclaimable)", "refId": "B" },
+        { "expr": "docker_volumes_size_bytes", "legendFormat": "Volumes (total)", "refId": "C" },
+        { "expr": "docker_build_cache_size_bytes", "legendFormat": "Build cache (total)", "refId": "D" },
+        { "expr": "docker_build_cache_reclaimable_bytes", "legendFormat": "Build cache (reclaimable)", "refId": "E" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "bytes", "min": 0, "custom": { "fillOpacity": 10 } }, "overrides": [] }
+    },
+    {
+      "id": 3,
+      "title": "Container Counts",
+      "type": "timeseries",
+      "gridPos": { "x": 12, "y": 6, "w": 12, "h": 9 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        { "expr": "docker_containers", "legendFormat": "{{state}}", "refId": "A" },
+        { "expr": "docker_images_total", "legendFormat": "images", "refId": "B" },
+        { "expr": "docker_volumes_total", "legendFormat": "volumes", "refId": "C" }
+      ],
+      "fieldConfig": { "defaults": { "min": 0, "custom": { "fillOpacity": 5 } }, "overrides": [] }
+    },
+    {
+      "id": 4,
+      "title": "CPU Usage per Container",
+      "type": "timeseries",
+      "gridPos": { "x": 0, "y": 15, "w": 12, "h": 9 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        { "expr": "docker_container_cpu_percent", "legendFormat": "{{name}}", "refId": "A" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "percent", "min": 0, "custom": { "fillOpacity": 10 } }, "overrides": [] }
+    },
+    {
+      "id": 5,
+      "title": "Memory Usage per Container",
+      "type": "timeseries",
+      "gridPos": { "x": 12, "y": 15, "w": 12, "h": 9 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        { "expr": "docker_container_memory_bytes", "legendFormat": "{{name}}", "refId": "A" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "bytes", "min": 0, "custom": { "fillOpacity": 10 } }, "overrides": [] }
+    },
+    {
+      "id": 6,
+      "title": "Container Status",
+      "type": "table",
+      "gridPos": { "x": 0, "y": 24, "w": 24, "h": 8 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        { "expr": "docker_container_running", "legendFormat": "", "refId": "A", "instant": true, "format": "table" }
+      ],
+      "transformations": [
+        { "id": "organize", "options": { "excludeByName": { "Time": true, "__name__": true, "job": true, "instance": true }, "renameByName": { "Value": "Running" } } }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": { "align": "left", "cellOptions": { "type": "color-background" } }
+        },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "Running" }, "properties": [ { "id": "mappings", "value": [ { "type": "value", "options": { "0": { "text": "stopped", "color": "red" }, "1": { "text": "running", "color": "green" } } } ] }, { "id": "thresholds", "value": { "mode": "absolute", "steps": [ { "color": "red", "value": null }, { "color": "green", "value": 1 } ] } } ] }
+        ]
+      }
+    }
+  ]
+}

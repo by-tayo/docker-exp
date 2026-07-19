@@ -1,0 +1,17 @@
+# Reference alert rule for this exporter's metrics. Not loaded unless you
+# either (a) run your own Prometheus with this file in `rule_files`, or
+# (b) copy it into an existing Prometheus's rule set — see README for how
+# this project wires into sys-exp's Prometheus/Grafana instead of running
+# its own.
+
+groups:
+  - name: docker-disk
+    rules:
+      - alert: DockerReclaimableDiskHigh
+        expr: (docker_images_reclaimable_bytes + docker_volumes_reclaimable_bytes + docker_build_cache_reclaimable_bytes) > 5e9
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Docker has over 5GB of reclaimable disk space"
+          description: "Unused images, volumes, and build cache combined exceed 5GB (current: {{ $value | humanize1024 }}B). Run `docker system prune` to reclaim it."
