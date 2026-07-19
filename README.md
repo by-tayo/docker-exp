@@ -10,15 +10,6 @@ different privilege footprint: it needs read access to `/var/run/docker.sock`
 (root-equivalent on the host), which a plain CPU/memory/disk exporter has no
 business requiring.
 
-## Why not cAdvisor?
-
-cAdvisor was the obvious first choice, but its per-container identification
-depends on reading the Docker daemon's real filesystem layout. On Docker
-Desktop (Windows/Mac), the daemon runs inside a separate hidden VM, so that
-layout is never reachable from a sibling container's bind mounts — cAdvisor
-silently degrades to anonymous cgroup IDs with no container names. This
-exporter talks to the Docker Engine API directly instead (same thing the
-`docker` CLI does), which works the same way everywhere.
 
 ## Screenshots
 
