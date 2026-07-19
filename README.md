@@ -20,6 +20,13 @@ silently degrades to anonymous cgroup IDs with no container names. This
 exporter talks to the Docker Engine API directly instead (same thing the
 `docker` CLI does), which works the same way everywhere.
 
+## Screenshots
+
+![Container Status](images/container_status.png)
+![CPU Usage per Container](images/cpu_per_container.png)
+![Disk Usage: Images / Volumes / Build Cache](images/disk_usage.png)
+![Docker Snapshot](images/docker_snapshot.png)
+
 ## Metrics
 
 | Metric | Meaning |
